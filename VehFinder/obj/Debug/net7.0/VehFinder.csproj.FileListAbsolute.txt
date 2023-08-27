@@ -1,0 +1,15 @@
+/Users/artem/Desktop/C#/VehFinder/VehFinder/bin/Debug/net7.0/VehFinder
+/Users/artem/Desktop/C#/VehFinder/VehFinder/bin/Debug/net7.0/VehFinder.deps.json
+/Users/artem/Desktop/C#/VehFinder/VehFinder/bin/Debug/net7.0/VehFinder.runtimeconfig.json
+/Users/artem/Desktop/C#/VehFinder/VehFinder/bin/Debug/net7.0/VehFinder.dll
+/Users/artem/Desktop/C#/VehFinder/VehFinder/bin/Debug/net7.0/VehFinder.pdb
+/Users/artem/Desktop/C#/VehFinder/VehFinder/obj/Debug/net7.0/VehFinder.csproj.AssemblyReference.cache
+/Users/artem/Desktop/C#/VehFinder/VehFinder/obj/Debug/net7.0/VehFinder.GeneratedMSBuildEditorConfig.editorconfig
+/Users/artem/Desktop/C#/VehFinder/VehFinder/obj/Debug/net7.0/VehFinder.AssemblyInfoInputs.cache
+/Users/artem/Desktop/C#/VehFinder/VehFinder/obj/Debug/net7.0/VehFinder.AssemblyInfo.cs
+/Users/artem/Desktop/C#/VehFinder/VehFinder/obj/Debug/net7.0/VehFinder.csproj.CoreCompileInputs.cache
+/Users/artem/Desktop/C#/VehFinder/VehFinder/obj/Debug/net7.0/VehFinder.dll
+/Users/artem/Desktop/C#/VehFinder/VehFinder/obj/Debug/net7.0/refint/VehFinder.dll
+/Users/artem/Desktop/C#/VehFinder/VehFinder/obj/Debug/net7.0/VehFinder.pdb
+/Users/artem/Desktop/C#/VehFinder/VehFinder/obj/Debug/net7.0/VehFinder.genruntimeconfig.cache
+/Users/artem/Desktop/C#/VehFinder/VehFinder/obj/Debug/net7.0/ref/VehFinder.dll
