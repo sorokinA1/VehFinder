@@ -2,6 +2,8 @@
     new DataManipulator(new VehiclesRepository(new StringsTextualRepository())));
 
 bool isSearchById = false;
+var searchParams = new List<string> { "val", "val", "" };
+
 
 // var country = vehFinderApp.GetComboBoxOptions(DataField.VehCountryField);
 // var level = vehFinderApp.GetComboBoxOptions(DataField.VehLevelField);
@@ -10,8 +12,8 @@ bool isSearchById = false;
 
 // test
 var repo = new DataManipulator(new VehiclesRepository(new StringsTextualRepository()));
-var x = repo.FindItem("Lat", isSearchById);
-Console.WriteLine(vehFinderApp.Country[0]);
+// var x = repo.FindItem("Lat", isSearchById);
+var y = repo.FindItem(searchParams);
 
 // var y = repo.FindItem(DataField.VehLevelField);
 // foreach (var s in y)
@@ -24,13 +26,18 @@ void ClickQuickSearchSimulator()
 {
 }
 
+void ClickQuickChangeFirstSearchParam()
+{
+    searchParams[0] = "UDES";
+}
+
 
 public class VehFinderApp
 {
-    public List<string> Country => _dataManipulator.FindItem(DataField.VehCountryField);
-    public List<string> Level => _dataManipulator.FindItem(DataField.VehLevelField);
-    public List<string> Type => _dataManipulator.FindItem(DataField.VehTypeField);
-    
+    // public List<string> Country => _dataManipulator.FindItem(DataField.VehCountryField);
+    // public List<string> Level => _dataManipulator.FindItem(DataField.VehLevelField);
+    // public List<string> Type => _dataManipulator.FindItem(DataField.VehTypeField);
+
     private readonly IDataManipulator _dataManipulator;
 
     public VehFinderApp(IDataManipulator dataManipulator)
@@ -39,10 +46,18 @@ public class VehFinderApp
     }
 
     // TODO may be
-    // public List<string> GetComboBoxOptions(DataField dataField)
-    // {
-    //     return _dataManipulator.FindItem(dataField);
-    // }
+    public List<string> GetComboBoxOptions(DataField dataField)
+    {
+        return _dataManipulator.FindItem(dataField);
+    }
+}
+
+public enum SearchParams
+{
+    NoParams = 0b0000,
+    Country = 0b0001,
+    Type = 0b0010,
+    Level = 0b0100,
 }
 
 public enum DataField
@@ -59,6 +74,7 @@ public interface IDataManipulator
 {
     List<string> FindItem(string vehicleName, bool isSearchById);
     List<string> FindItem(DataField dataField);
+    List<string> FindItem(List<string> searchParams);
 }
 
 public class DataManipulator : IDataManipulator
@@ -96,6 +112,18 @@ public class DataManipulator : IDataManipulator
         }
 
         return allUniqueValues.ToList();
+    }
+
+    public List<string> FindItem(List<string> searchParams)
+    {
+        var searchParameter = 0b0000;
+        if (searchParams[0] != "") searchParameter |= 1 << 1;
+        Console.WriteLine(Convert.ToString(searchParameter, 2));
+        if (searchParams[1] != "") searchParameter |= 1 << 2;
+        Console.WriteLine(Convert.ToString(searchParameter, 2));
+
+
+        return new List<string>();
     }
 }
 
