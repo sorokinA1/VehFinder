@@ -1,57 +1,101 @@
-﻿var vehFinderApp = new VehFinderApp(new VehiclesRepository(new StringsTextualRepository()));
+﻿var vehFinderApp = new VehFinderApp(
+    new DataManipulator(new VehiclesRepository(new StringsTextualRepository())));
 
-bool isSearchById = true;
+bool isSearchById = false;
+
+// var country = vehFinderApp.GetComboBoxOptions(DataField.VehCountryField);
+// var level = vehFinderApp.GetComboBoxOptions(DataField.VehLevelField);
+// var type = vehFinderApp.GetComboBoxOptions(DataField.VehTypeField);
 
 
 // test
-// var repo = new VehiclesRepository(new StringsTextualRepository());
-// repo.CreateVehicleCollection(repo.Read("vehicles.txt"));
-var repo = new VehFinderApp(new VehiclesRepository(new StringsTextualRepository()));
-var x = repo.FindOneVehicle("54913", isSearchById);
-foreach (var s in x)
-{
-    Console.WriteLine(s);
-}
+var repo = new DataManipulator(new VehiclesRepository(new StringsTextualRepository()));
+var x = repo.FindItem("Lat", isSearchById);
+Console.WriteLine(vehFinderApp.Country[0]);
+
+// var y = repo.FindItem(DataField.VehLevelField);
+// foreach (var s in y)
+// {
+//     Console.WriteLine(s);
+// }
 
 
 void ClickQuickSearchSimulator()
 {
-    var searchBoxValue = "UDES";
-    Console.WriteLine(vehFinderApp.FindOneVehicle(searchBoxValue, isSearchById));
 }
 
 
-public interface IVehFinderApp
+public class VehFinderApp
 {
-    List<string> FindOneVehicle(string vehicleName, bool isSearchById);
+    public List<string> Country => _dataManipulator.FindItem(DataField.VehCountryField);
+    public List<string> Level => _dataManipulator.FindItem(DataField.VehLevelField);
+    public List<string> Type => _dataManipulator.FindItem(DataField.VehTypeField);
+    
+    private readonly IDataManipulator _dataManipulator;
+
+    public VehFinderApp(IDataManipulator dataManipulator)
+    {
+        _dataManipulator = dataManipulator;
+    }
+
+    // TODO may be
+    // public List<string> GetComboBoxOptions(DataField dataField)
+    // {
+    //     return _dataManipulator.FindItem(dataField);
+    // }
 }
 
+public enum DataField
+{
+    VehNameField,
+    VehCountryField,
+    VehTypeField,
+    VehLevelField,
+    VehIdField,
+    VehLabelField
+}
 
-public class VehFinderApp : IVehFinderApp
+public interface IDataManipulator
+{
+    List<string> FindItem(string vehicleName, bool isSearchById);
+    List<string> FindItem(DataField dataField);
+}
+
+public class DataManipulator : IDataManipulator
 {
     private readonly List<string[]> _vehicleCollection;
 
-    public VehFinderApp(IVehRepository vehRepo)
+    public DataManipulator(IVehRepository vehRepo)
     {
         _vehicleCollection = vehRepo.CreateVehicleCollection(vehRepo.Read("vehicles.txt"));
     }
 
-    public List<string> FindOneVehicle(string vehicleName, bool isSearchById)
+    public List<string> FindItem(string vehicleName, bool isSearchById)
     {
-        const int VehNameField = 0;
-        const int VehIdField = 4;
         var vehiclesFound = new List<string>();
-        var placeToSearch = isSearchById ? VehIdField : VehNameField;
+        var placeToSearch = isSearchById ? DataField.VehIdField : DataField.VehNameField;
 
         foreach (var vehicle in _vehicleCollection)
         {
-            if (vehicle[placeToSearch].Contains(vehicleName))
+            if (vehicle[(int)placeToSearch].Contains(vehicleName))
             {
                 vehiclesFound.Add(string.Join(", ", vehicle));
             }
         }
 
         return vehiclesFound;
+    }
+
+    public List<string> FindItem(DataField dataField)
+    {
+        var allUniqueValues = new HashSet<string>();
+
+        foreach (var value in _vehicleCollection)
+        {
+            allUniqueValues.Add(value[(int)dataField]);
+        }
+
+        return allUniqueValues.ToList();
     }
 }
 
@@ -74,10 +118,10 @@ public class VehiclesRepository : IVehRepository
 
     public List<string> Read(string filePath)
     {
-        List<string> VehiclesFromFile = _stringsRepository.Read(filePath);
+        List<string> vehiclesFromFile = _stringsRepository.Read(filePath);
         var vehicles = new List<string>();
 
-        foreach (var vehicle in VehiclesFromFile)
+        foreach (var vehicle in vehiclesFromFile)
         {
             vehicles.Add(vehicle);
         }
@@ -94,19 +138,6 @@ public class VehiclesRepository : IVehRepository
             var extractedInfo = vehicle.Split("|");
             vehicleCollection.Add(extractedInfo);
         }
-
-        // foreach (var vehicle in vehicleList)
-        // {
-        //     var extractedInfo = vehicle.Split("|");
-        //     var vehicleInfo = new List<string>();
-        //
-        //     for (int i = 1; i < extractedInfo.Length; i++)
-        //     {
-        //         vehicleInfo.Add(extractedInfo[i]);
-        //     }
-        //
-        //     vehicleCollection.Add(extractedInfo[0], vehicleInfo);
-        // }
 
         return vehicleCollection;
     }
