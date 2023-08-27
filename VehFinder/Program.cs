@@ -1,11 +1,22 @@
 ﻿var vehFinderApp = new VehFinderApp(new VehiclesRepository(new StringsTextualRepository()));
 
-bool isSearchById = false;
+bool isSearchById = true;
+
+
+// test
+// var repo = new VehiclesRepository(new StringsTextualRepository());
+// repo.CreateVehicleCollection(repo.Read("vehicles.txt"));
+var repo = new VehFinderApp(new VehiclesRepository(new StringsTextualRepository()));
+var x = repo.FindOneVehicle("54913", isSearchById);
+foreach (var s in x)
+{
+    Console.WriteLine(s);
+}
 
 
 void ClickQuickSearchSimulator()
 {
-    var searchBoxValue = "Udes";
+    var searchBoxValue = "UDES";
     Console.WriteLine(vehFinderApp.FindOneVehicle(searchBoxValue, isSearchById));
 }
 
@@ -18,7 +29,7 @@ public interface IVehFinderApp
 
 public class VehFinderApp : IVehFinderApp
 {
-    private readonly Dictionary<string, List<string>> _vehicleCollection;
+    private readonly List<string[]> _vehicleCollection;
 
     public VehFinderApp(IVehRepository vehRepo)
     {
@@ -27,15 +38,27 @@ public class VehFinderApp : IVehFinderApp
 
     public List<string> FindOneVehicle(string vehicleName, bool isSearchById)
     {
-        var allVehiclesFound = new List<List<string>>();
-        var placeToSearch = isSearchById ? _vehicleCollection : _vehicleCollection.Values;
+        const int VehNameField = 0;
+        const int VehIdField = 4;
+        var vehiclesFound = new List<string>();
+        var placeToSearch = isSearchById ? VehIdField : VehNameField;
+
+        foreach (var vehicle in _vehicleCollection)
+        {
+            if (vehicle[placeToSearch].Contains(vehicleName))
+            {
+                vehiclesFound.Add(string.Join(", ", vehicle));
+            }
+        }
+
+        return vehiclesFound;
     }
 }
 
 public interface IVehRepository
 {
     List<string> Read(string filePath);
-    Dictionary<string, List<string>> CreateVehicleCollection(List<string> vehicleList);
+    List<string[]> CreateVehicleCollection(List<string> vehicleList);
 }
 
 public class VehiclesRepository : IVehRepository
@@ -62,22 +85,28 @@ public class VehiclesRepository : IVehRepository
         return vehicles;
     }
 
-    public Dictionary<string, List<string>> CreateVehicleCollection(List<string> vehicleList)
+    public List<string[]> CreateVehicleCollection(List<string> vehicleList)
     {
-        var vehicleCollection = new Dictionary<string, List<string>>();
+        var vehicleCollection = new List<string[]>();
 
         foreach (var vehicle in vehicleList)
         {
             var extractedInfo = vehicle.Split("|");
-            var vehicleInfo = new List<string>();
-
-            for (int i = 1; i < extractedInfo.Length; i++)
-            {
-                vehicleInfo.Add(extractedInfo[i]);
-            }
-
-            vehicleCollection.Add(extractedInfo[0], vehicleInfo);
+            vehicleCollection.Add(extractedInfo);
         }
+
+        // foreach (var vehicle in vehicleList)
+        // {
+        //     var extractedInfo = vehicle.Split("|");
+        //     var vehicleInfo = new List<string>();
+        //
+        //     for (int i = 1; i < extractedInfo.Length; i++)
+        //     {
+        //         vehicleInfo.Add(extractedInfo[i]);
+        //     }
+        //
+        //     vehicleCollection.Add(extractedInfo[0], vehicleInfo);
+        // }
 
         return vehicleCollection;
     }
