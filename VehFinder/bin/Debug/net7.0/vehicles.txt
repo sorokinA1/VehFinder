@@ -716,7 +716,7 @@ PzV_Poland|poland|MT|6|145|
 53TP_Markowskiego|poland|HT|8|2961|
 4TP|poland|LT|1|1169|
 60TP_Lewandowskiego|poland|HT|10|3473|
-T34_85_Rudy|poland|MT|6|51345|
+T34_85_Rudy_Poland|poland|MT|6|51345|
 DS_PZlnz|poland|MT|5|3729|
 DS_PZlnz_SH|poland|MT|1|5777|
 BUGI|poland|MT|6|3985|
@@ -806,7 +806,7 @@ LT_432|ussr|LT|8|45569|
 SU_130PM|ussr|AT-SPG|8|45057|
 SU_130PM_DR|ussr|AT-SPG|8|27905|
 S-51|ussr|SPG|7|1793|
-T_50_2|ussr|LT|6|45313|
+T_50_21|ussr|LT|6|45313|
 T_116|ussr|LT|3|44801|
 Object_703_II|ussr|HT|8|44289|
 Object_703_II_2|ussr|HT|8|30721|

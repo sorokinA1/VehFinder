@@ -1,52 +1,54 @@
-﻿// var vehFinderApp = new VehFinderApp(new VehiclesRepository(new StringsTextualRepository()));
-// vehFinderApp.Init();
+﻿var vehFinderApp = new VehFinderApp(new VehiclesRepository(new StringsTextualRepository()));
 
-
+bool isSearchById = false;
 
 
 void ClickQuickSearchSimulator()
 {
-    Console.WriteLine("Click");
+    var searchBoxValue = "Udes";
+    Console.WriteLine(vehFinderApp.FindOneVehicle(searchBoxValue, isSearchById));
 }
 
 
-public class VehFinderApp
+public interface IVehFinderApp
 {
-    private readonly IVehRepository _vehRepository;
+    List<string> FindOneVehicle(string vehicleName, bool isSearchById);
+}
 
-    public VehFinderApp(IVehRepository vehRepository)
+
+public class VehFinderApp : IVehFinderApp
+{
+    private readonly Dictionary<string, List<string>> _vehicleCollection;
+
+    public VehFinderApp(IVehRepository vehRepo)
     {
-        _vehRepository = vehRepository;
+        _vehicleCollection = vehRepo.CreateVehicleCollection(vehRepo.Read("vehicles.txt"));
     }
 
-    public void Init()
+    public List<string> FindOneVehicle(string vehicleName, bool isSearchById)
     {
-       var x = _vehRepository.Read("vehicles.txt");
-
-       foreach (var s in x)
-       {
-           Console.WriteLine(s);
-       }
+        var allVehiclesFound = new List<List<string>>();
+        var placeToSearch = isSearchById ? _vehicleCollection : _vehicleCollection.Values;
     }
 }
 
 public interface IVehRepository
 {
     List<string> Read(string filePath);
+    Dictionary<string, List<string>> CreateVehicleCollection(List<string> vehicleList);
 }
 
 public class VehiclesRepository : IVehRepository
 {
-    
     private readonly IStringsRepository _stringsRepository;
 
-    
+
     public VehiclesRepository(IStringsRepository stringsRepository)
     {
         _stringsRepository = stringsRepository;
     }
-    
-    
+
+
     public List<string> Read(string filePath)
     {
         List<string> VehiclesFromFile = _stringsRepository.Read(filePath);
@@ -58,6 +60,26 @@ public class VehiclesRepository : IVehRepository
         }
 
         return vehicles;
+    }
+
+    public Dictionary<string, List<string>> CreateVehicleCollection(List<string> vehicleList)
+    {
+        var vehicleCollection = new Dictionary<string, List<string>>();
+
+        foreach (var vehicle in vehicleList)
+        {
+            var extractedInfo = vehicle.Split("|");
+            var vehicleInfo = new List<string>();
+
+            for (int i = 1; i < extractedInfo.Length; i++)
+            {
+                vehicleInfo.Add(extractedInfo[i]);
+            }
+
+            vehicleCollection.Add(extractedInfo[0], vehicleInfo);
+        }
+
+        return vehicleCollection;
     }
 }
 
@@ -87,4 +109,3 @@ public class StringsTextualRepository : StringsRepository
         return fileContents.Split(Separator).ToList();
     }
 }
-
