@@ -4,9 +4,7 @@
 
 bool isSearchById = false;
 // var searchParams = new List<string> { "usa", "", "" };
-var list = new List<string> { "sayaka", "Kyoko", "Akari" };
 
-string[] names = new[] { }
 
 // var country = vehFinderApp.GetComboBoxOptions(DataField.VehCountryField);
 // var level = vehFinderApp.GetComboBoxOptions(DataField.VehLevelField);
@@ -14,13 +12,13 @@ string[] names = new[] { }
 
 
 // test
-// var repo = new DataManipulator(new VehiclesRepository
-//     (new StringsTextualRepository()), new IteratorHelper());
-// var y = repo.FindItem(new List<string> { "", "", "10" });
-// foreach (var x in y)
-// {
-//     Console.WriteLine(x);
-// }
+var repo = new DataManipulator(new VehiclesRepository
+    (new StringsTextualRepository()), new IteratorHelper());
+var y = repo.FindItem(new List<string> { "usa", "MT", "" });
+foreach (var x in y)
+{
+    Console.WriteLine(x);
+}
 // var x = repo.FindItem("Lat", isSearchById);
 // var y = repo.FindItem(DataField.VehLevelField);
 // foreach (var s in y)
@@ -142,14 +140,18 @@ public class DataManipulator : IDataManipulator
             case (int)SearchParams.NoParams:
                 return _iteratorHelper.Iterate(_vehicleCollection);
             case (int)SearchParams.Country:
-                return _iteratorHelper.Iterate(_vehicleCollection, DataField.VehCountryField, searchParams[0]);
+                Console.WriteLine("Show VehCountry");
+                return _iteratorHelper.Iterate(_vehicleCollection, searchParams, DataField.VehCountryField);
             case (int)SearchParams.Type:
-                return _iteratorHelper.Iterate(_vehicleCollection, DataField.VehTypeField, searchParams[1]);
+                Console.WriteLine("Show VehType");
+                return _iteratorHelper.Iterate(_vehicleCollection, searchParams, DataField.VehTypeField);
             case (int)SearchParams.Level:
-                return _iteratorHelper.Iterate(_vehicleCollection, DataField.VehLevelField, searchParams[2]);
+                Console.WriteLine("Show VehLevel");
+                return _iteratorHelper.Iterate(_vehicleCollection, searchParams, DataField.VehLevelField);
             case (int)SearchParams.CountryAndType:
-                Console.WriteLine("Show vehicle with country and type");
-                break;
+                Console.WriteLine("Show VehCountry and VehType");
+                return _iteratorHelper.Iterate(_vehicleCollection, searchParams, DataField.VehCountryField,
+                    DataField.VehTypeField);
             case (int)SearchParams.CountryAndLevel:
                 Console.WriteLine("Show vehicle with country and level");
                 break;
@@ -239,37 +241,49 @@ public class StringsTextualRepository : StringsRepository
 
 public class IteratorHelper
 {
-    public List<string> Iterate(List<string[]> collection, string itemName, params DataField[] dataField)
+    public List<string> Iterate(List<string[]> collection, List<string> itemName, params DataField[] dataField)
     {
         var itemsFound = new List<string>();
         var paramsCount = dataField.Length;
-        var placeToSearch = dataField;
 
+        Console.WriteLine($"ItemName[0]: {itemName[0]}");
+        Console.WriteLine($"Datafield[0]: {dataField[0]}");
+        Console.WriteLine($"ItemName[1]: {itemName[1]}");
+        Console.WriteLine($"Datafield[1]: {dataField[1]}");
+        
         foreach (var item in collection)
         {
-            if (paramsCount == 1)
+            switch (paramsCount)
             {
-                if (item[(int)placeToSearch[0]].Contains(itemName))
+                case 1:
                 {
-                    itemsFound.Add(string.Join(", ", item));
-                }
-            }
+                    if (item[(int)dataField[0]].Contains(itemName[0]))
+                    {
+                        itemsFound.Add(string.Join(", ", item));
+                    }
 
-            if (paramsCount == 2)
-            {
-                if (item[(int)placeToSearch[0]].Contains(itemName))
+                    break;
+                }
+                case 2:
                 {
-                    itemsFound.Add(string.Join(", ", item));
+                    if (item[(int)dataField[0]].Contains(itemName[0]) &&
+                        item[(int)dataField[1]].Contains(itemName[1]))
+                    {
+                        itemsFound.Add(string.Join(", ", item));
+                    }
+
+                    break;
                 }
             }
 
             if (paramsCount == 3)
             {
-                if (item[(int)placeToSearch[0]].Contains(itemName))
+                if (item[(int)dataField[0]].Contains(itemName[0]) &&
+                    item[(int)dataField[1]].Contains(itemName[1]) &&
+                    item[(int)dataField[2]].Contains(itemName[2]))
                 {
                     itemsFound.Add(string.Join(", ", item));
                 }
-
             }
             else
             {
