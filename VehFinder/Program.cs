@@ -14,7 +14,7 @@ bool isSearchById = false;
 // test
 var repo = new DataManipulator(new VehiclesRepository
     (new StringsTextualRepository()), new IteratorHelper());
-var y = repo.FindItem(new List<string> { "usa", "MT", "" });
+var y = repo.FindItem(new List<string> { "usa", "MT", "10" });
 foreach (var x in y)
 {
     Console.WriteLine(x);
@@ -250,7 +250,7 @@ public class IteratorHelper
         Console.WriteLine($"Datafield[0]: {dataField[0]}");
         Console.WriteLine($"ItemName[1]: {itemName[1]}");
         Console.WriteLine($"Datafield[1]: {dataField[1]}");
-        
+
         foreach (var item in collection)
         {
             switch (paramsCount)
@@ -274,20 +274,20 @@ public class IteratorHelper
 
                     break;
                 }
-            }
-
-            if (paramsCount == 3)
-            {
-                if (item[(int)dataField[0]].Contains(itemName[0]) &&
-                    item[(int)dataField[1]].Contains(itemName[1]) &&
-                    item[(int)dataField[2]].Contains(itemName[2]))
+                case 3:
                 {
-                    itemsFound.Add(string.Join(", ", item));
+                    if (item[(int)dataField[0]].Contains(itemName[0]) &&
+                        item[(int)dataField[1]].Contains(itemName[1]) &&
+                        item[(int)dataField[2]].Contains(itemName[2]))
+                    {
+                        itemsFound.Add(string.Join(", ", item));
+                    }
+
+                    break;
                 }
-            }
-            else
-            {
-                itemsFound.Add(string.Join(", ", item));
+                default:
+                    itemsFound.Add(string.Join(", ", item));
+                    break;
             }
         }
 
