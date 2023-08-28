@@ -1,9 +1,12 @@
 ﻿var vehFinderApp = new VehFinderApp(
-    new DataManipulator(new VehiclesRepository(new StringsTextualRepository())));
+    new DataManipulator(new VehiclesRepository(
+        new StringsTextualRepository()), new IteratorHelper()));
 
 bool isSearchById = false;
-var searchParams = new List<string> { "val", "val", "" };
+// var searchParams = new List<string> { "usa", "", "" };
+var list = new List<string> { "sayaka", "Kyoko", "Akari" };
 
+string[] names = new[] { }
 
 // var country = vehFinderApp.GetComboBoxOptions(DataField.VehCountryField);
 // var level = vehFinderApp.GetComboBoxOptions(DataField.VehLevelField);
@@ -11,10 +14,14 @@ var searchParams = new List<string> { "val", "val", "" };
 
 
 // test
-var repo = new DataManipulator(new VehiclesRepository(new StringsTextualRepository()));
+// var repo = new DataManipulator(new VehiclesRepository
+//     (new StringsTextualRepository()), new IteratorHelper());
+// var y = repo.FindItem(new List<string> { "", "", "10" });
+// foreach (var x in y)
+// {
+//     Console.WriteLine(x);
+// }
 // var x = repo.FindItem("Lat", isSearchById);
-var y = repo.FindItem(searchParams);
-
 // var y = repo.FindItem(DataField.VehLevelField);
 // foreach (var s in y)
 // {
@@ -26,10 +33,10 @@ void ClickQuickSearchSimulator()
 {
 }
 
-void ClickQuickChangeFirstSearchParam()
-{
-    searchParams[0] = "UDES";
-}
+// void ClickQuickChangeFirstSearchParam()
+// {
+//     searchParams[0] = "UDES";
+// }
 
 
 public class VehFinderApp
@@ -58,6 +65,10 @@ public enum SearchParams
     Country = 0b0001,
     Type = 0b0010,
     Level = 0b0100,
+    CountryAndType = 0b0011,
+    CountryAndLevel = 0b0101,
+    TypeAndLevel = 0b0110,
+    CountryAndLevelAndType = 0b0111
 }
 
 public enum DataField
@@ -80,9 +91,11 @@ public interface IDataManipulator
 public class DataManipulator : IDataManipulator
 {
     private readonly List<string[]> _vehicleCollection;
+    private readonly IteratorHelper _iteratorHelper;
 
-    public DataManipulator(IVehRepository vehRepo)
+    public DataManipulator(IVehRepository vehRepo, IteratorHelper iteratorHelper)
     {
+        _iteratorHelper = iteratorHelper;
         _vehicleCollection = vehRepo.CreateVehicleCollection(vehRepo.Read("vehicles.txt"));
     }
 
@@ -116,14 +129,40 @@ public class DataManipulator : IDataManipulator
 
     public List<string> FindItem(List<string> searchParams)
     {
-        var searchParameter = 0b0000;
-        if (searchParams[0] != "") searchParameter |= 1 << 1;
-        Console.WriteLine(Convert.ToString(searchParameter, 2));
-        if (searchParams[1] != "") searchParameter |= 1 << 2;
-        Console.WriteLine(Convert.ToString(searchParameter, 2));
+        var searchParameter = (int)SearchParams.NoParams;
+        if (searchParams[0] != "") searchParameter |= 1;
+        if (searchParams[1] != "") searchParameter |= 1 << 1;
+        if (searchParams[2] != "") searchParameter |= 1 << 2;
+        // Console.WriteLine(Convert.ToString(searchParameter, 2));
+
+        var itemsFound = new List<string>();
+        switch (searchParameter)
+        {
+            // [0] country, [1] type, [2] level
+            case (int)SearchParams.NoParams:
+                return _iteratorHelper.Iterate(_vehicleCollection);
+            case (int)SearchParams.Country:
+                return _iteratorHelper.Iterate(_vehicleCollection, DataField.VehCountryField, searchParams[0]);
+            case (int)SearchParams.Type:
+                return _iteratorHelper.Iterate(_vehicleCollection, DataField.VehTypeField, searchParams[1]);
+            case (int)SearchParams.Level:
+                return _iteratorHelper.Iterate(_vehicleCollection, DataField.VehLevelField, searchParams[2]);
+            case (int)SearchParams.CountryAndType:
+                Console.WriteLine("Show vehicle with country and type");
+                break;
+            case (int)SearchParams.CountryAndLevel:
+                Console.WriteLine("Show vehicle with country and level");
+                break;
+            case (int)SearchParams.TypeAndLevel:
+                Console.WriteLine("Show vehicle with type and level");
+                break;
+            case (int)SearchParams.CountryAndLevelAndType:
+                Console.WriteLine("Show vehicle with country and type and level");
+                break;
+        }
 
 
-        return new List<string>();
+        return itemsFound;
     }
 }
 
@@ -197,3 +236,66 @@ public class StringsTextualRepository : StringsRepository
         return fileContents.Split(Separator).ToList();
     }
 }
+
+public class IteratorHelper
+{
+    public List<string> Iterate(List<string[]> collection, string itemName, params DataField[] dataField)
+    {
+        var itemsFound = new List<string>();
+        var paramsCount = dataField.Length;
+        var placeToSearch = dataField;
+
+        foreach (var item in collection)
+        {
+            if (paramsCount == 1)
+            {
+                if (item[(int)placeToSearch[0]].Contains(itemName))
+                {
+                    itemsFound.Add(string.Join(", ", item));
+                }
+            }
+
+            if (paramsCount == 2)
+            {
+                if (item[(int)placeToSearch[0]].Contains(itemName))
+                {
+                    itemsFound.Add(string.Join(", ", item));
+                }
+            }
+
+            if (paramsCount == 3)
+            {
+                if (item[(int)placeToSearch[0]].Contains(itemName))
+                {
+                    itemsFound.Add(string.Join(", ", item));
+                }
+
+            }
+            else
+            {
+                itemsFound.Add(string.Join(", ", item));
+            }
+        }
+
+        return itemsFound;
+    }
+
+    public List<string> Iterate(List<string[]> collection)
+    {
+        var itemsFound = new List<string>();
+
+        foreach (var item in collection)
+        {
+            itemsFound.Add(string.Join(", ", item));
+        }
+
+        return itemsFound;
+    }
+}
+
+// if ((numbers in array == 1))
+// if ((numbers in array == 2))
+// if ((numbers in array == 3))
+// {
+//     sum += number;
+// }
