@@ -2,8 +2,20 @@
     new DataManipulator(new VehiclesRepository(
         new StringsTextualRepository()), new IteratorHelper()));
 
-bool isSearchById = false;
+var placeToSearch = DataField.VehNameField;
 // var searchParams = new List<string> { "usa", "", "" };
+// Ho_Ri_3, japan, AT-SPG, 10, 24096
+
+var controller = new DataManipulator(new VehiclesRepository(new StringsTextualRepository()), new IteratorHelper());
+// var x = controller.FindItem("Ho", DataField.VehNameField);
+
+var x = controller.FindUniqueItems(DataField.VehCountryField);
+Console.WriteLine(x);
+
+foreach (var s in x)
+{
+    Console.WriteLine(s);
+}
 
 
 // var country = vehFinderApp.GetComboBoxOptions(DataField.VehCountryField);
@@ -12,13 +24,13 @@ bool isSearchById = false;
 
 
 // test
-var repo = new DataManipulator(new VehiclesRepository
-    (new StringsTextualRepository()), new IteratorHelper());
-var y = repo.FindItem(new List<string> { "japan", "LT", "10" });
-foreach (var x in y)
-{
-    Console.WriteLine(x);
-}
+// var repo = new DataManipulator(new VehiclesRepository
+//     (new StringsTextualRepository()), new IteratorHelper());
+// var y = repo.FindItem(new List<string> { "japan", "", "10" });
+// foreach (var x in y)
+// {
+//     Console.WriteLine(x);
+// }
 // var x = repo.FindItem("Lat", isSearchById);
 // var y = repo.FindItem(DataField.VehLevelField);
 // foreach (var s in y)
@@ -53,7 +65,7 @@ public class VehFinderApp
     // TODO may be
     public List<string> GetComboBoxOptions(DataField dataField)
     {
-        return _dataManipulator.FindItem(dataField);
+        return _dataManipulator.FindUniqueItems(dataField);
     }
 }
 
@@ -81,8 +93,8 @@ public enum DataField
 
 public interface IDataManipulator
 {
-    List<string> FindItem(string vehicleName, bool isSearchById);
-    List<string> FindItem(DataField dataField);
+    List<string> FindItem(string vehicleName, DataField searchField);
+    List<string> FindUniqueItems(DataField dataField);
     List<string> FindItem(List<string> searchParams);
 }
 
@@ -97,23 +109,7 @@ public class DataManipulator : IDataManipulator
         _vehicleCollection = vehRepo.CreateVehicleCollection(vehRepo.Read("vehicles.txt"));
     }
 
-    public List<string> FindItem(string vehicleName, bool isSearchById)
-    {
-        var vehiclesFound = new List<string>();
-        var placeToSearch = isSearchById ? DataField.VehIdField : DataField.VehNameField;
-
-        foreach (var vehicle in _vehicleCollection)
-        {
-            if (vehicle[(int)placeToSearch].Contains(vehicleName))
-            {
-                vehiclesFound.Add(string.Join(", ", vehicle));
-            }
-        }
-
-        return vehiclesFound;
-    }
-
-    public List<string> FindItem(DataField dataField)
+    public List<string> FindUniqueItems(DataField dataField)
     {
         var allUniqueValues = new HashSet<string>();
 
@@ -123,6 +119,12 @@ public class DataManipulator : IDataManipulator
         }
 
         return allUniqueValues.ToList();
+    }
+
+    public List<string> FindItem(string vehicleName, DataField searchField)
+    {
+        return _iteratorHelper.Iterate(
+            _vehicleCollection, new List<string> { vehicleName }, searchField);
     }
 
     public List<string> FindItem(List<string> searchParams)
