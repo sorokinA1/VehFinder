@@ -1,21 +1,27 @@
-﻿var vehFinderApp = new VehFinderApp(
-    new DataManipulator(new VehiclesRepository(
-        new StringsTextualRepository()), new IteratorHelper()));
+﻿// var vehFinderApp = new VehFinderApp(
+//     new DataManipulator(new VehiclesRepository(
+//         new StringsTextualRepository())));
 
-var placeToSearch = DataField.VehNameField;
-// var searchParams = new List<string> { "usa", "", "" };
+// var placeToSearch = DataField.VehNameField;
+// var searchParams = new List<string> { "usa", "LT", "10" };
 // Ho_Ri_3, japan, AT-SPG, 10, 24096
 
-var controller = new DataManipulator(new VehiclesRepository(new StringsTextualRepository()), new IteratorHelper());
+// var controller = new DataManipulator(new VehiclesRepository(new StringsTextualRepository()));
 // var x = controller.FindItem("Ho", DataField.VehNameField);
 
-var x = controller.FindUniqueItems(DataField.VehCountryField);
-Console.WriteLine(x);
+// var x = controller.FindUniqueItems(DataField.VehCountryField);
+// var x = controller.FindItem(new List<string> { "usa", "SPG", "" });
+// Console.WriteLine(x);
 
-foreach (var s in x)
-{
-    Console.WriteLine(s);
-}
+// foreach (var s in x)
+// {
+//     Console.WriteLine(s);
+// }
+
+var test = new VehiclesRepository(new StringsTextualRepository());
+var xa = test.CreateVehicleCollection(test.Read("vehicles.txt"));
+test.Write("tanks.txt", xa);
+// test.Write("tanks.txt", );
 
 
 // var country = vehFinderApp.GetComboBoxOptions(DataField.VehCountryField);
@@ -101,12 +107,14 @@ public interface IDataManipulator
 public class DataManipulator : IDataManipulator
 {
     private readonly List<string[]> _vehicleCollection;
-    private readonly IteratorHelper _iteratorHelper;
 
-    public DataManipulator(IVehRepository vehRepo, IteratorHelper iteratorHelper)
+    public DataManipulator(IVehRepository vehRepo)
     {
-        _iteratorHelper = iteratorHelper;
-        _vehicleCollection = vehRepo.CreateVehicleCollection(vehRepo.Read("vehicles.txt"));
+        _vehicleCollection = vehRepo.CreateVehicleCollection(vehRepo.Read("tanks.txt"));
+    }
+
+    public void UpdateLabel()
+    {
     }
 
     public List<string> FindUniqueItems(DataField dataField)
@@ -123,18 +131,19 @@ public class DataManipulator : IDataManipulator
 
     public List<string> FindItem(string vehicleName, DataField searchField)
     {
-        return _iteratorHelper.Iterate(
+        return IteratorHelper.Iterate(
             _vehicleCollection, new List<string> { vehicleName }, searchField);
     }
 
     public List<string> FindItem(List<string> searchParams)
     {
-        var searchNamesList = new List<string>() { };
+        var searchNamesList = new List<string>();
 
         var searchParameter = (int)SearchParams.NoParams;
 
         for (int i = 0; i < searchParams.Count; i++)
         {
+            // 1.country, 2.type, 3.level
             if (searchParams[i] == "") continue;
             searchParameter |= 1 << i;
             searchNamesList.Add(searchParams[i]);
@@ -145,24 +154,24 @@ public class DataManipulator : IDataManipulator
         {
             // Console.WriteLine("Show VehCountry and VehType");
             case (int)SearchParams.NoParams:
-                return _iteratorHelper.Iterate(_vehicleCollection);
+                return IteratorHelper.Iterate(_vehicleCollection);
             case (int)SearchParams.Country:
-                return _iteratorHelper.Iterate(_vehicleCollection, searchNamesList, DataField.VehCountryField);
+                return IteratorHelper.Iterate(_vehicleCollection, searchNamesList, DataField.VehCountryField);
             case (int)SearchParams.Type:
-                return _iteratorHelper.Iterate(_vehicleCollection, searchNamesList, DataField.VehTypeField);
+                return IteratorHelper.Iterate(_vehicleCollection, searchNamesList, DataField.VehTypeField);
             case (int)SearchParams.Level:
-                return _iteratorHelper.Iterate(_vehicleCollection, searchNamesList, DataField.VehLevelField);
+                return IteratorHelper.Iterate(_vehicleCollection, searchNamesList, DataField.VehLevelField);
             case (int)SearchParams.CountryAndType:
-                return _iteratorHelper.Iterate(_vehicleCollection, searchNamesList, DataField.VehCountryField,
+                return IteratorHelper.Iterate(_vehicleCollection, searchNamesList, DataField.VehCountryField,
                     DataField.VehTypeField);
             case (int)SearchParams.CountryAndLevel:
-                return _iteratorHelper.Iterate(_vehicleCollection, searchNamesList, DataField.VehCountryField,
+                return IteratorHelper.Iterate(_vehicleCollection, searchNamesList, DataField.VehCountryField,
                     DataField.VehLevelField);
             case (int)SearchParams.TypeAndLevel:
-                return _iteratorHelper.Iterate(_vehicleCollection, searchNamesList, DataField.VehTypeField,
+                return IteratorHelper.Iterate(_vehicleCollection, searchNamesList, DataField.VehTypeField,
                     DataField.VehLevelField);
             case (int)SearchParams.CountryAndLevelAndType:
-                return _iteratorHelper.Iterate(_vehicleCollection, searchNamesList, DataField.VehCountryField,
+                return IteratorHelper.Iterate(_vehicleCollection, searchNamesList, DataField.VehCountryField,
                     DataField.VehTypeField, DataField.VehLevelField);
         }
 
@@ -173,6 +182,7 @@ public class DataManipulator : IDataManipulator
 public interface IVehRepository
 {
     List<string> Read(string filePath);
+    void Write(string filePath, List<string[]> allRecipes);
     List<string[]> CreateVehicleCollection(List<string> vehicleList);
 }
 
@@ -186,7 +196,6 @@ public class VehiclesRepository : IVehRepository
         _stringsRepository = stringsRepository;
     }
 
-
     public List<string> Read(string filePath)
     {
         List<string> vehiclesFromFile = _stringsRepository.Read(filePath);
@@ -198,6 +207,12 @@ public class VehiclesRepository : IVehRepository
         }
 
         return vehicles;
+    }
+
+    public void Write(string filePath, List<string[]> allVehicles)
+    {
+        var vehiclesAsStrings = IteratorHelper.Iterate(allVehicles);
+        _stringsRepository.Write(filePath, vehiclesAsStrings);
     }
 
     public List<string[]> CreateVehicleCollection(List<string> vehicleList)
@@ -217,6 +232,7 @@ public class VehiclesRepository : IVehRepository
 public interface IStringsRepository
 {
     List<string> Read(string filePath);
+    void Write(string filePath, List<string> strings);
 }
 
 public abstract class StringsRepository : IStringsRepository
@@ -229,6 +245,13 @@ public abstract class StringsRepository : IStringsRepository
     }
 
     protected abstract List<string> TextToStrings(string fileContents);
+
+    public void Write(string filePath, List<string> strings)
+    {
+        File.WriteAllText(filePath, StringsToText(strings));
+    }
+
+    protected abstract string StringsToText(List<string> strings);
 }
 
 public class StringsTextualRepository : StringsRepository
@@ -239,11 +262,16 @@ public class StringsTextualRepository : StringsRepository
     {
         return fileContents.Split(Separator).ToList();
     }
+
+    protected override string StringsToText(List<string> strings)
+    {
+        return string.Join(Separator, strings);
+    }
 }
 
-public class IteratorHelper
+public static class IteratorHelper
 {
-    public List<string> Iterate(List<string[]> collection, List<string> itemName, params DataField[] dataField)
+    public static List<string> Iterate(List<string[]> collection, List<string> itemName, params DataField[] dataField)
     {
         var itemsFound = new List<string>();
         var paramsCount = itemName.Count;
@@ -288,15 +316,16 @@ public class IteratorHelper
         return itemsFound;
     }
 
-    public List<string> Iterate(List<string[]> collection)
+    public static List<string> Iterate(List<string[]> collection)
     {
         var itemsFound = new List<string>();
 
         foreach (var item in collection)
         {
-            itemsFound.Add(string.Join(", ", item));
+            itemsFound.Add(string.Join("|", item));
         }
 
         return itemsFound;
+        // return collection.Select(item => string.Join(", ", item)).ToList();
     }
 }
