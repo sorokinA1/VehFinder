@@ -1,4 +1,4 @@
-T1_Cunningham|usa|LT|1|94281|Autoloader
+T1_Cunningham|usa|LT|1|94281|
 M2_lt|usa|LT|2|38269|
 M3_Stuart|usa|LT|3|57752|
 M3_Grant|usa|MT|4|34359|

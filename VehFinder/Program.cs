@@ -1,6 +1,6 @@
-﻿// var vehFinderApp = new VehFinderApp(
-//     new DataManipulator(new VehiclesRepository(
-//         new StringsTextualRepository())));
+﻿var vehFinderApp = new VehFinderApp(
+    new DataManipulator(new VehiclesRepository(
+        new StringsTextualRepository())));
 
 // var placeToSearch = DataField.VehNameField;
 // var searchParams = new List<string> { "usa", "LT", "10" };
@@ -10,11 +10,28 @@ var controller = new DataManipulator(new VehiclesRepository(new StringsTextualRe
 // var x = controller.FindItem("Ho", DataField.VehNameField);
 
 // var x = controller.FindUniqueItems(DataField.VehCountryField);
-var x = controller.FindItem(new List<string> { "usa", "SPG", "10" });
+// var x = controller.FindItem(new List<string> { "usa", "SPG", "10" });
+var x = controller.FindItem("94281", DataField.VehIdField);
+var selectedVehicle = x[0].Length;
+Console.WriteLine(selectedVehicle);
+var selected = x[0];
 
-// foreach (var s in x)
+foreach (var s in selected)
+{
+    Console.Write(s + " ");
+}
+
+Console.WriteLine("");
+controller.UpdateLabel(selected, "Autoloader");
+
+foreach (var s in selected)
+{
+    Console.Write(s + " ");
+}
+
+// foreach (var s in selectedVehicle)
 // {
-//     Console.WriteLine(s[0]);
+//     Console.Write(s + " | ");
 // }
 
 // foreach (var s in x)
@@ -116,14 +133,19 @@ public interface IDataManipulator
 public class DataManipulator : IDataManipulator
 {
     private readonly List<string[]> _vehicleCollection;
+    private readonly IVehRepository _vehRepo;
 
     public DataManipulator(IVehRepository vehRepo)
     {
-        _vehicleCollection = vehRepo.CreateVehicleCollection(vehRepo.Read("vehicles.txt"));
+        _vehRepo = vehRepo;
+        _vehicleCollection = _vehRepo.CreateVehicleCollection(_vehRepo.Read("vehicles.txt"));
     }
 
-    public void UpdateLabel()
+    public void UpdateLabel(string[] selectedVehicle, string updatedLabel)
     {
+        var vehArrayIndex = _vehicleCollection.IndexOf(selectedVehicle);
+        _vehicleCollection[vehArrayIndex][^1] = updatedLabel;
+        _vehRepo.Write("vehicles.txt", _vehicleCollection);
     }
 
     public List<string> FindUniqueItems(DataField dataField)
