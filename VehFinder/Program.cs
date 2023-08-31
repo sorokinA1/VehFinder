@@ -2,6 +2,19 @@
     new DataManipulator(new VehiclesRepository(
         new StringsTextualRepository())));
 
+
+var filterSettings = new List<string> { "usa", "LT", "SPG" };
+
+var selectedVehicle = "";
+
+
+var countries = vehFinderApp.GetComboBoxOptions(DataField.VehCountryField);
+
+foreach (var country in countries)
+{
+    Console.WriteLine(country);
+}
+/*
 // var placeToSearch = DataField.VehNameField;
 // var searchParams = new List<string> { "usa", "LT", "10" };
 // Ho_Ri_3, japan, AT-SPG, 10, 24096
@@ -38,7 +51,7 @@ foreach (var s in selected)
 // {
 //     foreach (var f in s)
 //     {
-//         Console.Write(f + ", ");   
+//         Console.Write(f + ", ");
 //     }
 //
 //     Console.WriteLine("");
@@ -69,7 +82,7 @@ foreach (var s in selected)
 // {
 //     Console.WriteLine(s);
 // }
-
+*/
 
 void ClickQuickSearchSimulator()
 {
@@ -83,10 +96,6 @@ void ClickQuickSearchSimulator()
 
 public class VehFinderApp
 {
-    // public List<string> Country => _dataManipulator.FindItem(DataField.VehCountryField);
-    // public List<string> Level => _dataManipulator.FindItem(DataField.VehLevelField);
-    // public List<string> Type => _dataManipulator.FindItem(DataField.VehTypeField);
-
     private readonly IDataManipulator _dataManipulator;
 
     public VehFinderApp(IDataManipulator dataManipulator)
@@ -94,7 +103,6 @@ public class VehFinderApp
         _dataManipulator = dataManipulator;
     }
 
-    // TODO may be
     public List<string> GetComboBoxOptions(DataField dataField)
     {
         return _dataManipulator.FindUniqueItems(dataField);
