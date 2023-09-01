@@ -8,12 +8,22 @@ var filterSettings = new List<string> { "usa", "LT", "SPG" };
 var selectedVehicle = "";
 
 
-var countries = vehFinderApp.GetComboBoxOptions(DataField.VehCountryField);
+var finder = new DataManipulator(new VehiclesRepository(new StringsTextualRepository()));
 
-foreach (var country in countries)
+var x = finder.FindItem("UDES", DataField.VehNameField);
+
+foreach (var s in x)
 {
-    Console.WriteLine(country);
+    Console.WriteLine(string.Join(" | ", s));
 }
+
+
+// var countries = vehFinderApp.GetComboBoxOptions(DataField.VehCountryField);
+//
+// foreach (var country in countries)
+// {
+//     Console.WriteLine(country);
+// }
 /*
 // var placeToSearch = DataField.VehNameField;
 // var searchParams = new List<string> { "usa", "LT", "10" };
